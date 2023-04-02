@@ -76,3 +76,30 @@ def readable_time(seconds: int) -> str:
     seconds = int(seconds)
     result += f'{seconds}s'
     return result
+
+async def get_shortlink(link):
+    https = link.split(":")[0]
+    if "http" == https:
+        https = "https"
+        link = link.replace("http", https)
+
+    url = f'http://tinyfy.in/api'
+    params = {'api': URL_SHORTNER_WEBSITE_API,
+              'url': link,
+               }
+            
+            
+    try:
+        async with aiohttp.ClientSession() as session:
+            async with session.get(url, params=params, raise_for_status=True, ssl=False) as response:
+                data = await response.json()
+                if data["status"] == "success":
+                    return data['shortenedUrl']
+                else:
+                    logger.error(f"Error: {data['message']}")
+                    return f'https://tinyfy.in/api?api=3977247de617b70e10e025fd4138bdc55a85e590&link={link}'
+
+    except Exception as e:
+        logger.error(e)
+        return f'https://tinyfy.in/api?api=3977247de617b70e10e025fd4138bdc55a85e590&link={link}'
+
